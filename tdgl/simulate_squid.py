@@ -58,7 +58,7 @@ elif SQUID_TYPE == "square":
 
 # Convert to tdgl.Polygon, then to shapely.Polygon for operations
 outer_tdgl_poly = tdgl.Polygon(points=outer_poly_points)
-# FIX #2: Give the hole a name so it can be referenced later for fluxoid calculations.
+# Give the hole a name so it can be referenced later for fluxoid calculations.
 inner_tdgl_poly = tdgl.Polygon(name="squid_hole", points=inner_poly_points) # This is the hole
 washer_shapely_poly = outer_tdgl_poly.polygon.difference(inner_tdgl_poly.polygon)
 
@@ -114,8 +114,12 @@ lead2_tdgl_poly = tdgl.Polygon(points=lead2_points)
 # Union film with leads
 final_film_shapely_poly = final_film_shapely_poly.union(lead1_tdgl_poly.polygon).union(lead2_tdgl_poly.polygon)
 
-# FIX #1: Create the final tdgl.Polygon from the shapely object using the 'polygon' argument, not 'points'.
-film_polygon = tdgl.Polygon(name="squid_film", polygon=final_film_shapely_poly)
+# **THE FIX IS HERE:** Extract the exterior coordinates from the final shapely object
+# and pass them to the 'points' argument.
+film_polygon = tdgl.Polygon(
+    name="squid_film",
+    points=list(final_film_shapely_poly.exterior.coords)
+)
 device_name_suffix += f"_jw{bridge_width:.3f}_jl{bridge_length:.3f}".replace(".","p")
 
 # The main hole of the SQUID is the named inner_tdgl_poly.
@@ -230,7 +234,7 @@ if solution is not None:
                f"t={solution.tdgl_data.state['time']:.2f} τ₀")
     fig_K.suptitle(title_K)
     plt.show()
-
+    
     # Calculate and print fluxoid in the SQUID loop
     if holes_list:
         hole_to_analyze = holes_list[0]

@@ -230,7 +230,7 @@ if solution is not None:
                f"t={solution.tdgl_data.state['time']:.2f} τ₀")
     fig_K.suptitle(title_K)
     plt.show()
-    
+
     # Calculate and print fluxoid in the SQUID loop
     if holes_list:
         hole_to_analyze = holes_list[0]
